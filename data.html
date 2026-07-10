@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Prediction</title>
+    <style>
+        /* Body styling for water-based theme */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background: url('assets/bg-water.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Form container */
+        form {
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        label {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #333;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #date{
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #333;
+            font-size: 16px;
+            outline: none;
+        }
+
+        select:focus, input:focus {
+            border-color: #4caf50;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #333;
+            text-align: left;
+            max-width: 400px;
+            word-wrap: break-word;
+        }
+
+        #result p {
+            margin: 10px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<h1>Water Prediction</h1>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<form id="data-form">
+
+    <label for="division">Select Division:</label>
+    <select id="division" required>
+        <option value="Division 1">Division 1</option>
+        <option value="Division 2">Division 2</option>
+    </select>
+
+    <label for="area">Select Area:</label>
+    <select id="area" required>
+        <option value="">Select Area</option>
+        <option value="Kumaran Nagar">Kumaran Nagar</option>
+        <option value="Kurinji Nagar">Kurinji Nagar</option>
+        <option value="Pakkamudayanpet">Pakkamudayanpet</option>
+    </select>
+
+    <label for="startDate">Start Date</label>
+    <input type="date" id="startDate" required>
+
+    <label for="endDate">End Date</label>
+    <input type="date" id="endDate">
+
+    <button type="submit">Fetch Data</button>
+
+</form>
+
+<div id="result"></div>
+<script>
+
+    let dataset = [];
+
+fetch("10yr_processed.json")
+.then(response => response.json())
+.then(data => {
+    dataset = data;
+
+    console.log("JSON Loaded");
+    console.log(dataset);
+    console.log("Total Records:", dataset.length);
+})
+.catch(error => {
+    console.error("Error loading JSON:", error);
+});
+document.getElementById("data-form").addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    const division = document.getElementById("division").value;
+    const area = document.getElementById("area").value;
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    const resultDiv = document.getElementById("result");
+
+    let filtered = dataset.filter(item=>{
+
+        const d = new Date(item.Date);
+
+        return (
+            d >= new Date(startDate) &&
+            (endDate==="" || d<=new Date(endDate))
+        );
+
+    });
+
+    if(filtered.length===0){
+
+        resultDiv.innerHTML="<h3>No data found.</h3>";
+
+        return;
+
+    }
+
+if (endDate === "") {
+
+    // Single Date Report
+    const latest = filtered[filtered.length - 1];
+
+    resultDiv.innerHTML = `
+        <h2>Water Report</h2>
+
+        <p><strong>Division :</strong> ${division}</p>
+
+        <p><strong>Area :</strong> ${area}</p>
+
+        <p><strong>Date :</strong> ${startDate}</p>
+
+        <p><strong>House Connections :</strong> ${latest.connection}</p>
+
+        <p><strong>Water Demand :</strong> ${Math.round(latest.actual_limit)} Litres</p>
+
+        <p><strong>Water Supplied :</strong> ${Math.round(latest.consumption)} Litres</p>
+
+        <p><strong>Report Generated :</strong> ${new Date().toLocaleString()}</p>
+    `;
+
+} else {
+
+    const totalDemand = filtered.reduce((sum, item) => sum + Number(item.actual_limit), 0);
+
+    const totalSupply = filtered.reduce((sum, item) => sum + Number(item.consumption), 0);
+
+    const averageSupply = Math.round(totalSupply / filtered.length);
+
+    resultDiv.innerHTML = `
+        <h2>Water Report</h2>
+
+        <p><strong>Division :</strong> ${division}</p>
+
+        <p><strong>Area :</strong> ${area}</p>
+
+        <p><strong>From :</strong> ${startDate}</p>
+
+        <p><strong>To :</strong> ${endDate}</p>
+
+        <p><strong>Total Water Demand :</strong> ${Math.round(totalDemand)} Litres</p>
+
+        <p><strong>Total Water Supplied :</strong> ${Math.round(totalSupply)} Litres</p>
+
+        <p><strong>Average Supply :</strong> ${averageSupply} Litres/day</p>
+
+        <div style="height:400px;">
+            <canvas id="myChart"></canvas>
+        </div>
+    `;
+
+    const labels = filtered.map(item => item.Date);
+    const demand = filtered.map(item => Number(item.actual_limit));
+    const supply = filtered.map(item => Number(item.consumption));
+
+    const ctx = document.getElementById("myChart").getContext("2d");
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Water Demand",
+                    data: demand,
+                    borderColor: "blue",
+                    borderWidth: 2,
+                    fill: false
+                },
+                {
+                    label: "Water Supplied",
+                    data: supply,
+                    borderColor: "green",
+                    borderWidth: 2,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    }
+
+});
+</script>
+</body>
+</html>

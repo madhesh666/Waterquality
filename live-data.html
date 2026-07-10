@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Monitoring</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="assets/sea.mp4" type="video/mp4">
+    </video>
+
+<div class="container">
+
+    <h1>Water Quality Monitoring</h1>
+
+    <div class="sensor-data">
+
+        <div class="data-item">
+            <span class="label">pH Level:</span>
+            <span id="phValue">Loading...</span>
+        </div>
+
+        <div class="data-item">
+            <span class="label">TDS Level (ppm):</span>
+            <span id="tdsValue">Loading...</span>
+        </div>
+
+        <div class="data-item">
+            <span class="label">Turbidity (NTU):</span>
+            <span id="turbidityValue">Loading...</span>
+        </div>
+
+        <div class="data-item">
+            <span class="label">Acid Level (%):</span>
+            <span id="acidLevelValue">Loading...</span>
+        </div>
+
+        <div class="data-item">
+            <span class="label">Flow Rate (L/min):</span>
+            <span id="flowRateValue">Loading...</span>
+        </div>
+
+        <div class="data-item">
+            <span class="label">Total Liters:</span>
+            <span id="totalLitersValue">Loading...</span>
+        </div>
+
+        <div class="data-item">
+            <span class="label">Last Updated:</span>
+            <span id="lastUpdate">Loading...</span>
+        </div>
+
+        <div class="data-item">
+            <span class="label">Connection Status:</span>
+            <span id="connectionStatus">Connected</span>
+        </div>
+        <div class="data-item">
+    <span class="label">Pressure (kPa):</span>
+    <span id="pressureValue">Loading...</span>
+</div>
+        <div class="data-item">
+    <span class="label">EC (µS/cm):</span>
+    <span id="ecValue">Loading...</span>
+</div>
+
+    </div>
+
+</div>
+
+<script src="google-sheet.js"></script>
+
+</body>
+</html>
